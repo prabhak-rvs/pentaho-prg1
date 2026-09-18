@@ -1,113 +1,92 @@
-```yaml
 name: SQL Assignment Autograding
 
 on:
   push:
     paths:
-      - 'Assignment_1/answers.sql'
-      - '.github/workflows/autograde.yml'
+      - "Assignment_1/answers.sql"
+      - ".github/workflows/autograde.yml"
+  workflow_dispatch:
 
 jobs:
   autograde:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check answers.sql exists
+      - name: Check answers.sql
         run: |
           if [ ! -f "Assignment_1/answers.sql" ]; then
-            echo "❌ answers.sql file not found."
+            echo "FAIL: answers.sql not found"
             exit 1
           fi
-          echo "✅ answers.sql found."
 
-      - name: Check SQL file is not empty
-        run: |
-          if [ ! -s "Assignment_1/answers.sql" ]; then
-            echo "❌ answers.sql is empty."
-            exit 1
-          fi
-          echo "✅ answers.sql is not empty."
+          echo "PASS: answers.sql found"
 
       - name: Check Question A
         run: |
-          FILE="Assignment_1/answers.sql"
+          file="Assignment_1/answers.sql"
 
-          if grep -Eiq "SUM\s*\(" "$FILE" &&
-             grep -Eiq "AVG\s*\(" "$FILE" &&
-             grep -Eiq "AS\s+total_sales" "$FILE" &&
-             grep -Eiq "AS\s+avg_sales" "$FILE"; then
-            echo "✅ Question A passed"
-          else
-            echo "❌ Question A failed"
-            exit 1
-          fi
+          grep -Eiq "SUM[[:space:]]*\(" "$file" || { echo "FAIL: SUM() missing"; exit 1; }
+          grep -Eiq "AVG[[:space:]]*\(" "$file" || { echo "FAIL: AVG() missing"; exit 1; }
+          grep -Eiq "total_sales" "$file" || { echo "FAIL: total_sales missing"; exit 1; }
+          grep -Eiq "avg_sales" "$file" || { echo "FAIL: avg_sales missing"; exit 1; }
+
+          echo "PASS: Question A"
 
       - name: Check Question B
         run: |
-          FILE="Assignment_1/answers.sql"
+          file="Assignment_1/answers.sql"
 
-          if grep -Eiq "COUNT\s*\(" "$FILE" &&
-             grep -Eiq "GROUP\s+BY" "$FILE" &&
-             grep -Eiq "ORDER\s+BY" "$FILE" &&
-             grep -Eiq "DESC" "$FILE" &&
-             grep -Eiq "AS\s+no_of_customers" "$FILE"; then
-            echo "✅ Question B passed"
-          else
-            echo "❌ Question B failed"
-            exit 1
-          fi
+          grep -Eiq "COUNT[[:space:]]*\(" "$file" || { echo "FAIL: COUNT() missing"; exit 1; }
+          grep -Eiq "GROUP[[:space:]]+BY" "$file" || { echo "FAIL: GROUP BY missing"; exit 1; }
+          grep -Eiq "ORDER[[:space:]]+BY" "$file" || { echo "FAIL: ORDER BY missing"; exit 1; }
+          grep -Eiq "DESC" "$file" || { echo "FAIL: DESC missing"; exit 1; }
+          grep -Eiq "no_of_customers" "$file" || { echo "FAIL: no_of_customers missing"; exit 1; }
+
+          echo "PASS: Question B"
 
       - name: Check Question C
         run: |
-          FILE="Assignment_1/answers.sql"
+          file="Assignment_1/answers.sql"
 
-          if grep -Eiq "MAX\s*\(" "$FILE" ||
-             grep -Eiq "ORDER\s+BY.*DESC.*LIMIT\s+1" "$FILE"; then
-            echo "✅ Question C passed"
-          else
-            echo "❌ Question C failed"
-            exit 1
-          fi
+          grep -Eiq "MAX[[:space:]]*\(" "$file" || {
+            grep -Eiq "LIMIT[[:space:]]+1" "$file" || {
+              echo "FAIL: MAX() or LIMIT 1 missing"
+              exit 1
+            }
+          }
+
+          echo "PASS: Question C"
 
       - name: Check Question D
         run: |
-          FILE="Assignment_1/answers.sql"
+          file="Assignment_1/answers.sql"
 
-          if grep -Eiq "COUNT\s*\(" "$FILE" &&
-             grep -Eiq "GROUP\s+BY" "$FILE" &&
-             grep -Eiq "ORDER\s+BY" "$FILE" &&
-             grep -Eiq "DESC" "$FILE" &&
-             grep -Eiq "product_id" "$FILE" &&
-             grep -Eiq "no_of_products_sold" "$FILE"; then
-            echo "✅ Question D passed"
-          else
-            echo "❌ Question D failed"
-            exit 1
-          fi
+          grep -Eiq "product_id" "$file" || { echo "FAIL: product_id missing"; exit 1; }
+          grep -Eiq "no_of_products_sold" "$file" || { echo "FAIL: no_of_products_sold missing"; exit 1; }
+          grep -Eiq "COUNT[[:space:]]*\(" "$file" || { echo "FAIL: COUNT() missing"; exit 1; }
+          grep -Eiq "GROUP[[:space:]]+BY" "$file" || { echo "FAIL: GROUP BY missing"; exit 1; }
+          grep -Eiq "ORDER[[:space:]]+BY" "$file" || { echo "FAIL: ORDER BY missing"; exit 1; }
+          grep -Eiq "DESC" "$file" || { echo "FAIL: DESC missing"; exit 1; }
+
+          echo "PASS: Question D"
 
       - name: Check Question E
         run: |
-          FILE="Assignment_1/answers.sql"
+          file="Assignment_1/answers.sql"
 
-          if grep -Eiq "Atlantic" "$FILE" &&
-             grep -Eiq "TABLES" "$FILE" &&
-             grep -Eiq "COUNT\s*\(" "$FILE" &&
-             grep -Eiq "customer_name" "$FILE" &&
-             grep -Eiq "no_of_tables_purchased" "$FILE"; then
-            echo "✅ Question E passed"
-          else
-            echo "❌ Question E failed"
-            exit 1
-          fi
+          grep -Eiq "Atlantic" "$file" || { echo "FAIL: Atlantic missing"; exit 1; }
+          grep -Eiq "TABLES" "$file" || { echo "FAIL: TABLES missing"; exit 1; }
+          grep -Eiq "customer_name" "$file" || { echo "FAIL: customer_name missing"; exit 1; }
+          grep -Eiq "no_of_tables_purchased" "$file" || { echo "FAIL: no_of_tables_purchased missing"; exit 1; }
+          grep -Eiq "COUNT[[:space:]]*\(" "$file" || { echo "FAIL: COUNT() missing"; exit 1; }
 
-      - name: Assignment Result
+          echo "PASS: Question E"
+
+      - name: Final Result
         run: |
-          echo "======================================"
-          echo "🎉 ALL SQL CHECKS PASSED!"
-          echo "======================================"
-          echo "Questions A, B, C, D and E passed."
-```
+          echo "=================================="
+          echo "ALL CHECKS PASSED"
+          echo "=================================="
