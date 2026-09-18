@@ -1,0 +1,113 @@
+```yaml
+name: SQL Assignment Autograding
+
+on:
+  push:
+    paths:
+      - 'Assignment_1/answers.sql'
+      - '.github/workflows/autograde.yml'
+
+jobs:
+  autograde:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check answers.sql exists
+        run: |
+          if [ ! -f "Assignment_1/answers.sql" ]; then
+            echo "❌ answers.sql file not found."
+            exit 1
+          fi
+          echo "✅ answers.sql found."
+
+      - name: Check SQL file is not empty
+        run: |
+          if [ ! -s "Assignment_1/answers.sql" ]; then
+            echo "❌ answers.sql is empty."
+            exit 1
+          fi
+          echo "✅ answers.sql is not empty."
+
+      - name: Check Question A
+        run: |
+          FILE="Assignment_1/answers.sql"
+
+          if grep -Eiq "SUM\s*\(" "$FILE" &&
+             grep -Eiq "AVG\s*\(" "$FILE" &&
+             grep -Eiq "AS\s+total_sales" "$FILE" &&
+             grep -Eiq "AS\s+avg_sales" "$FILE"; then
+            echo "✅ Question A passed"
+          else
+            echo "❌ Question A failed"
+            exit 1
+          fi
+
+      - name: Check Question B
+        run: |
+          FILE="Assignment_1/answers.sql"
+
+          if grep -Eiq "COUNT\s*\(" "$FILE" &&
+             grep -Eiq "GROUP\s+BY" "$FILE" &&
+             grep -Eiq "ORDER\s+BY" "$FILE" &&
+             grep -Eiq "DESC" "$FILE" &&
+             grep -Eiq "AS\s+no_of_customers" "$FILE"; then
+            echo "✅ Question B passed"
+          else
+            echo "❌ Question B failed"
+            exit 1
+          fi
+
+      - name: Check Question C
+        run: |
+          FILE="Assignment_1/answers.sql"
+
+          if grep -Eiq "MAX\s*\(" "$FILE" ||
+             grep -Eiq "ORDER\s+BY.*DESC.*LIMIT\s+1" "$FILE"; then
+            echo "✅ Question C passed"
+          else
+            echo "❌ Question C failed"
+            exit 1
+          fi
+
+      - name: Check Question D
+        run: |
+          FILE="Assignment_1/answers.sql"
+
+          if grep -Eiq "COUNT\s*\(" "$FILE" &&
+             grep -Eiq "GROUP\s+BY" "$FILE" &&
+             grep -Eiq "ORDER\s+BY" "$FILE" &&
+             grep -Eiq "DESC" "$FILE" &&
+             grep -Eiq "product_id" "$FILE" &&
+             grep -Eiq "no_of_products_sold" "$FILE"; then
+            echo "✅ Question D passed"
+          else
+            echo "❌ Question D failed"
+            exit 1
+          fi
+
+      - name: Check Question E
+        run: |
+          FILE="Assignment_1/answers.sql"
+
+          if grep -Eiq "Atlantic" "$FILE" &&
+             grep -Eiq "TABLES" "$FILE" &&
+             grep -Eiq "COUNT\s*\(" "$FILE" &&
+             grep -Eiq "customer_name" "$FILE" &&
+             grep -Eiq "no_of_tables_purchased" "$FILE"; then
+            echo "✅ Question E passed"
+          else
+            echo "❌ Question E failed"
+            exit 1
+          fi
+
+      - name: Assignment Result
+        run: |
+          echo "======================================"
+          echo "🎉 ALL SQL CHECKS PASSED!"
+          echo "======================================"
+          echo "Questions A, B, C, D and E passed."
+```
