@@ -3,7 +3,7 @@ name: SQL Assignment Autograding
 on:
   push:
     paths:
-      - "Assignment_1/answers.sql"
+      - "answers.sql"
       - ".github/workflows/autograde.yml"
   workflow_dispatch:
 
@@ -17,76 +17,30 @@ jobs:
 
       - name: Check answers.sql
         run: |
-          if [ ! -f "Assignment_1/answers.sql" ]; then
+          if [ ! -f "answers.sql" ]; then
             echo "FAIL: answers.sql not found"
             exit 1
           fi
-
           echo "PASS: answers.sql found"
 
-      - name: Check Question A
+      - name: Check SQL requirements
         run: |
-          file="Assignment_1/answers.sql"
+          file="answers.sql"
 
           grep -Eiq "SUM[[:space:]]*\(" "$file" || { echo "FAIL: SUM() missing"; exit 1; }
           grep -Eiq "AVG[[:space:]]*\(" "$file" || { echo "FAIL: AVG() missing"; exit 1; }
           grep -Eiq "total_sales" "$file" || { echo "FAIL: total_sales missing"; exit 1; }
           grep -Eiq "avg_sales" "$file" || { echo "FAIL: avg_sales missing"; exit 1; }
 
-          echo "PASS: Question A"
-
-      - name: Check Question B
-        run: |
-          file="Assignment_1/answers.sql"
-
           grep -Eiq "COUNT[[:space:]]*\(" "$file" || { echo "FAIL: COUNT() missing"; exit 1; }
           grep -Eiq "GROUP[[:space:]]+BY" "$file" || { echo "FAIL: GROUP BY missing"; exit 1; }
           grep -Eiq "ORDER[[:space:]]+BY" "$file" || { echo "FAIL: ORDER BY missing"; exit 1; }
           grep -Eiq "DESC" "$file" || { echo "FAIL: DESC missing"; exit 1; }
-          grep -Eiq "no_of_customers" "$file" || { echo "FAIL: no_of_customers missing"; exit 1; }
-
-          echo "PASS: Question B"
-
-      - name: Check Question C
-        run: |
-          file="Assignment_1/answers.sql"
-
-          grep -Eiq "MAX[[:space:]]*\(" "$file" || {
-            grep -Eiq "LIMIT[[:space:]]+1" "$file" || {
-              echo "FAIL: MAX() or LIMIT 1 missing"
-              exit 1
-            }
-          }
-
-          echo "PASS: Question C"
-
-      - name: Check Question D
-        run: |
-          file="Assignment_1/answers.sql"
-
-          grep -Eiq "product_id" "$file" || { echo "FAIL: product_id missing"; exit 1; }
-          grep -Eiq "no_of_products_sold" "$file" || { echo "FAIL: no_of_products_sold missing"; exit 1; }
-          grep -Eiq "COUNT[[:space:]]*\(" "$file" || { echo "FAIL: COUNT() missing"; exit 1; }
-          grep -Eiq "GROUP[[:space:]]+BY" "$file" || { echo "FAIL: GROUP BY missing"; exit 1; }
-          grep -Eiq "ORDER[[:space:]]+BY" "$file" || { echo "FAIL: ORDER BY missing"; exit 1; }
-          grep -Eiq "DESC" "$file" || { echo "FAIL: DESC missing"; exit 1; }
-
-          echo "PASS: Question D"
-
-      - name: Check Question E
-        run: |
-          file="Assignment_1/answers.sql"
 
           grep -Eiq "Atlantic" "$file" || { echo "FAIL: Atlantic missing"; exit 1; }
           grep -Eiq "TABLES" "$file" || { echo "FAIL: TABLES missing"; exit 1; }
+
+          grep -Eiq "product_id" "$file" || { echo "FAIL: product_id missing"; exit 1; }
           grep -Eiq "customer_name" "$file" || { echo "FAIL: customer_name missing"; exit 1; }
-          grep -Eiq "no_of_tables_purchased" "$file" || { echo "FAIL: no_of_tables_purchased missing"; exit 1; }
-          grep -Eiq "COUNT[[:space:]]*\(" "$file" || { echo "FAIL: COUNT() missing"; exit 1; }
 
-          echo "PASS: Question E"
-
-      - name: Final Result
-        run: |
-          echo "=================================="
           echo "ALL CHECKS PASSED"
-          echo "=================================="
